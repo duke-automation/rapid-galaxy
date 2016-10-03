@@ -24,7 +24,6 @@
 
     - name: Create Systemd Startup/Stop script (RHEL)
       template: src=galaxyd.service.j2 dest=/usr/lib/systemd/system/galaxyd.service owner=root group=root mode=0644
-      notify: reload-systemd
       when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
     - name: Create Systemd Startup/Stop script (Ubuntu)
@@ -34,8 +33,3 @@
 
     - name: Kick off the service
       service: name=galaxyd state=started enabled=yes
-
-  handlers:
-
-    - name: reload-systemd
-      command: systemctl --daemon-reload
