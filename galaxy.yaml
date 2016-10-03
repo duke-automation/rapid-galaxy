@@ -12,6 +12,8 @@
       yum: name={{ item }} state=present
       with_items:
         - java-openjdk
+        - httpd
+        - mod_ssl
       when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
     - name: Create galaxy user
@@ -37,3 +39,13 @@
 
     - name: Kick off the service
       service: name=galaxyd state=started enabled=yes
+
+    - name: Open up Firewall
+      command: firewall-cmd --permanent --zone=public --add-port=443/tcp
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+      notify: Reload Firewall
+
+  handlers:
+    - name: Reload Firewall
+      command: firewall-cmd --reload
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
