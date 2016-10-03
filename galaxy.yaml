@@ -1,0 +1,23 @@
+---
+
+- hosts: localhost
+
+  vars:
+    galaxy_install_dir: '/opt/galaxy'
+
+  tasks:
+
+    - name: Install dependencies (CentOS/RHEL)
+      yum: name={{ item }} state=present
+      with_items:
+        - java-openjdk
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+    - name: Clone galaxy git repository
+      git: repo=https://github.com/galaxyproject/galaxy/ dest="{{ galaxy_install_dir}}"
+
+    - name: Create Systemd Startup/Stop script
+      template: src=galaxyd.service.j2 dest=/usr/lib/systemd/system/galaxyd.service owner=root group=root mode=0644
+
+    - name: Kick off the service
+      service: name=galaxyd state=started enabled=yes

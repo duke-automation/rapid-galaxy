@@ -1,0 +1,22 @@
+# /usr/lib/systemd/system/galaxyd.service
+
+[Unit]
+Description=Galaxy Web Server
+#Requires=httpd.service postgresql.service munge.service
+#After=httpd.service postgresql.service munge.service
+
+[Service]
+Type=forking
+User=root
+Group=root
+PIDFile={{ galaxy_install_dir}}/paster.pid
+ExecStartPre=/usr/bin/rm -f {{ galaxy_install_dir }}/paster.pid
+ExecStart=/bin/bash {{ galaxy_install_dir }}/run.sh --daemon
+ExecReload=/bin/bash {{ galaxy_install_dir }}/run.sh restart
+ExecStop=/bin/bash {{ galaxy_install_dir }}/run.sh --stop-daemon
+WorkingDirectory={{ galaxy_install_dir }}
+RestartSec=5
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target
